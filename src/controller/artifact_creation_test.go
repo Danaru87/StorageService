@@ -18,7 +18,7 @@ type MockedArtifactService struct {
 	expectedError error
 }
 
-func (artifactService MockedArtifactService) CreateArtifact(artifactDto *model.ArtifactDTO) (*model.ArtifactDTO, error) {
+func (artifactService *MockedArtifactService) CreateArtifact(artifactDto *model.ArtifactDTO) (*model.ArtifactDTO, error) {
 	artifactDto.Uuid = artifactService.expectedUuid
 	return artifactDto, artifactService.expectedError
 }

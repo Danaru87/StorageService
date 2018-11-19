@@ -17,7 +17,7 @@ func NewArtifactController(artifactService service.IArtifactService) *ArtifactCo
 	}
 }
 
-func (artifactController ArtifactController) Post(ctx *gin.Context) {
+func (artifactController *ArtifactController) Post(ctx *gin.Context) {
 	var (
 		artifactToCreate model.ArtifactDTO
 		createdArtifact  *model.ArtifactDTO
