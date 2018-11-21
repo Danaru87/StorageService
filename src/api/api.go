@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/UPrefer/StorageService/config"
 	"github.com/UPrefer/StorageService/controller"
 	"github.com/UPrefer/StorageService/dao"
 	"github.com/UPrefer/StorageService/service"
@@ -10,11 +11,21 @@ import (
 func Handlers() *gin.Engine {
 	engine := gin.Default()
 
+	var (
+		database = config.NewDatabase("mongodb://root:root@localhost:27017", "StorageService")
+
+		artifactDao = dao.NewArtifactDao(database)
+
+		artifactService = service.NewArtifactService(artifactDao)
+
+		artifactController = controller.NewArtifactController(artifactService)
+	)
+
 	v1 := engine.Group("/v1")
 	{
 		artifactResource := v1.Group("/artifact")
 		{
-			artifactResource.POST("", (controller.NewArtifactController(service.NewArtifactService(dao.NewArtifactDao()))).Post)
+			artifactResource.POST("", artifactController.Post)
 		}
 	}
 	return engine

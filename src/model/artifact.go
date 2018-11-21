@@ -1,6 +1,6 @@
 package model
 
 type ArtifactDTO struct {
-	BaseModel
-	Name string `json:"name" binding:"required"`
+	Uuid string `json:"uuid" bson:"_id,omitempty"`
+	Name string `json:"name" binding:"required" bson:"name"`
 }

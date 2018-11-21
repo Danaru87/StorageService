@@ -4,6 +4,7 @@ import (
 	"github.com/UPrefer/StorageService/model"
 	"github.com/UPrefer/StorageService/service"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -31,6 +32,7 @@ func (artifactController *ArtifactController) Post(ctx *gin.Context) {
 
 	createdArtifact, err = artifactController.artifactService.CreateArtifact(&artifactToCreate)
 	if err != nil {
+		log.Print(err)
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
