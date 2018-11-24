@@ -3,31 +3,37 @@ package service
 import (
 	"github.com/UPrefer/StorageService/dao"
 	"github.com/UPrefer/StorageService/model"
-	"github.com/google/uuid"
 )
 
 type IArtifactService interface {
-	CreateArtifact(artifactDto *model.ArtifactDTO) (*model.ArtifactDTO, error)
+	CreateArtifact() (*model.ArtifactDTO, error)
+	ReadArtifact(id string) (*model.ArtifactDTO, error)
+}
+
+func NewArtifactService(utilsService IUtilsService, artifactDAO dao.IArtifactDao) *ArtifactService {
+	return &ArtifactService{utilsService: utilsService, artifactDao: artifactDAO}
 }
 
 type ArtifactService struct {
-	artifactDao dao.IArtifactDao
+	utilsService IUtilsService
+	artifactDao  dao.IArtifactDao
 }
 
-func NewArtifactService(artifactDAO dao.IArtifactDao) *ArtifactService {
-	return &ArtifactService{artifactDao: artifactDAO}
+func (artifactService *ArtifactService) ReadArtifact(id string) (*model.ArtifactDTO, error) {
+	panic("implement me")
 }
 
-func (artifactService *ArtifactService) CreateArtifact(artifactDto *model.ArtifactDTO) (*model.ArtifactDTO, error) {
-	var newId, err = uuid.NewUUID()
+func (artifactService *ArtifactService) CreateArtifact() (*model.ArtifactDTO, error) {
+	var newId, err = artifactService.utilsService.NewUUID()
 	if err != nil {
-		return artifactDto, err
+		return nil, err
 	}
-	artifactDto.Uuid = newId.String()
+
+	var artifactDto = &model.ArtifactDTO{Uuid: newId}
 
 	err = artifactService.artifactDao.CreateArtifact(artifactDto)
 	if err != nil {
-		return artifactDto, err
+		return nil, err
 	}
 	return artifactDto, nil
 }

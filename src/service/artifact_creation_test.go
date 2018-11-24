@@ -17,13 +17,15 @@ func (dao *MockedArtifactDao) CreateArtifact(*model.ArtifactDTO) error {
 
 type ArtifactCreationTestSuite struct {
 	suite.Suite
-	mockedArtifactDao *MockedArtifactDao
-	artifactService   *ArtifactService
+	mockedUtilsService *MockedUtilsService
+	mockedArtifactDao  *MockedArtifactDao
+	artifactService    *ArtifactService
 }
 
 func (suite *ArtifactCreationTestSuite) SetupTest() {
+	suite.mockedUtilsService = &MockedUtilsService{}
 	suite.mockedArtifactDao = &MockedArtifactDao{}
-	suite.artifactService = NewArtifactService(suite.mockedArtifactDao)
+	suite.artifactService = NewArtifactService(suite.mockedUtilsService, suite.mockedArtifactDao)
 }
 
 func TestArtifactCreation(t *testing.T) {
@@ -36,7 +38,7 @@ func (suite *ArtifactCreationTestSuite) Test_ShouldReturnCreatedArtifact_WhenNoE
 	var expectedError error = nil
 
 	//WHEN
-	var createdArtifactDto, err = suite.artifactService.CreateArtifact(&model.ArtifactDTO{})
+	var createdArtifactDto, err = suite.artifactService.CreateArtifact()
 
 	//THEN
 	suite.Assert().Equal(expectedError, err)
@@ -51,7 +53,22 @@ func (suite *ArtifactCreationTestSuite) Test_ShouldReturnEncounteredError_WhenDa
 	suite.mockedArtifactDao.expectedError = expectedError
 
 	//WHEN
-	var createdArtifactDto, err = suite.artifactService.CreateArtifact(&model.ArtifactDTO{})
+	var createdArtifactDto, err = suite.artifactService.CreateArtifact()
+
+	//THEN
+	suite.Assert().Equal(expectedError, err)
+	suite.Assert().Equal(expectedArtifactDto, createdArtifactDto)
+}
+
+func (suite *ArtifactCreationTestSuite) Test_ShouldReturnEncounteredError_WhenUUIDGenerationFails() {
+	//GIVEN
+	var expectedArtifactDto *model.ArtifactDTO = nil
+	var expectedError = errors.New("Any UUID generation Error")
+
+	suite.mockedUtilsService.NewUUID_ExpectedError = expectedError
+
+	//WHEN
+	var createdArtifactDto, err = suite.artifactService.CreateArtifact()
 
 	//THEN
 	suite.Assert().Equal(expectedError, err)

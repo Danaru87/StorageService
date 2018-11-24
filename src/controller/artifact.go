@@ -20,17 +20,11 @@ func NewArtifactController(artifactService service.IArtifactService) *ArtifactCo
 
 func (artifactController *ArtifactController) Post(ctx *gin.Context) {
 	var (
-		artifactToCreate model.ArtifactDTO
-		createdArtifact  *model.ArtifactDTO
-		err              error
+		createdArtifact *model.ArtifactDTO
+		err             error
 	)
 
-	err = ctx.BindJSON(&artifactToCreate)
-	if err != nil {
-		return
-	}
-
-	createdArtifact, err = artifactController.artifactService.CreateArtifact(&artifactToCreate)
+	createdArtifact, err = artifactController.artifactService.CreateArtifact()
 	if err != nil {
 		log.Print(err)
 		ctx.AbortWithStatus(http.StatusInternalServerError)
@@ -39,4 +33,19 @@ func (artifactController *ArtifactController) Post(ctx *gin.Context) {
 
 	ctx.Status(http.StatusCreated)
 	ctx.Header("Location", ctx.Request.RequestURI+"/"+createdArtifact.Uuid)
+}
+
+func (artifactController *ArtifactController) Get(ctx *gin.Context) {
+	var foundArtifact, err = artifactController.artifactService.ReadArtifact(ctx.Param("artifact_id"))
+
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	if foundArtifact == nil {
+		ctx.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+	ctx.JSON(http.StatusOK, foundArtifact)
 }

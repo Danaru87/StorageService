@@ -16,7 +16,8 @@ func Handlers() *gin.Engine {
 
 		artifactDao = dao.NewArtifactDao(database)
 
-		artifactService = service.NewArtifactService(artifactDao)
+		utilsService    = service.NewUtilsService()
+		artifactService = service.NewArtifactService(utilsService, artifactDao)
 
 		artifactController = controller.NewArtifactController(artifactService)
 	)

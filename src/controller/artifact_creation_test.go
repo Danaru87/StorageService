@@ -1,47 +1,30 @@
 package controller
 
 import (
-	"bytes"
 	"errors"
 	"github.com/UPrefer/StorageService/model"
+	"github.com/UPrefer/StorageService/service"
 	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-type MockedArtifactService struct {
-	mock.Mock
-	expectedUuid  string
-	expectedError error
-}
-
-func (artifactService *MockedArtifactService) CreateArtifact(artifactDto *model.ArtifactDTO) (*model.ArtifactDTO, error) {
-	artifactDto.Uuid = artifactService.expectedUuid
-	return artifactDto, artifactService.expectedError
-}
-
 type ArtifactCreationTestSuite struct {
 	suite.Suite
-	validArtifactJson   *bytes.Buffer
-	invalidArtifactJson *bytes.Buffer
 
 	context               *gin.Context
 	httpRecorder          *httptest.ResponseRecorder
-	mockedArtifactService *MockedArtifactService
+	mockedArtifactService *service.MockedArtifactService
 	artifactController    *ArtifactController
 }
 
 func (suite *ArtifactCreationTestSuite) SetupTest() {
-	suite.mockedArtifactService = new(MockedArtifactService)
+	suite.mockedArtifactService = new(service.MockedArtifactService)
 	suite.artifactController = NewArtifactController(suite.mockedArtifactService)
 	suite.httpRecorder = httptest.NewRecorder()
 	suite.context, _ = gin.CreateTestContext(suite.httpRecorder)
-
-	suite.validArtifactJson = bytes.NewBufferString("{\"name\": \"artifactName\"}")
-	suite.invalidArtifactJson = bytes.NewBufferString("{}")
 }
 
 func TestArtifactCreation(t *testing.T) {
@@ -54,9 +37,9 @@ func (suite *ArtifactCreationTestSuite) Test_ShouldSetStatusHttp201_AndEmptyBody
 	var expectedBody = ""
 	var expectedLocationHeader = "/artifact/0000-1111-2222-3333"
 
-	suite.mockedArtifactService.expectedUuid = "0000-1111-2222-3333"
+	suite.mockedArtifactService.CreateArtifact_ExpectedArtifact = &model.ArtifactDTO{Uuid: "0000-1111-2222-3333"}
 
-	suite.context.Request = httptest.NewRequest(http.MethodPost, "/artifact", suite.validArtifactJson)
+	suite.context.Request = httptest.NewRequest(http.MethodPost, "/artifact", nil)
 
 	//WHEN
 	suite.artifactController.Post(suite.context)
@@ -72,24 +55,9 @@ func (suite *ArtifactCreationTestSuite) Test_ShouldSetStatusHttp500_AndEmptyBody
 	var expectedStatus = http.StatusInternalServerError
 	var expectedBody = ""
 
-	suite.mockedArtifactService.expectedError = errors.New("random failure")
+	suite.mockedArtifactService.CreateArtifact_ExpectedError = errors.New("random failure")
 
-	suite.context.Request = httptest.NewRequest(http.MethodPost, "/artifact", suite.validArtifactJson)
-
-	//WHEN
-	suite.artifactController.Post(suite.context)
-
-	//THEN
-	suite.Equal(expectedStatus, suite.context.Writer.Status())
-	suite.Equal(expectedBody, suite.httpRecorder.Body.String())
-}
-
-func (suite *ArtifactCreationTestSuite) Test_ShouldSetHttpStatus400_AndEmptyBody_WhenDataInputIsInvalid() {
-	//GIVEN
-	var expectedStatus = http.StatusBadRequest
-	var expectedBody = ""
-
-	suite.context.Request = httptest.NewRequest(http.MethodPost, "/artifact", suite.invalidArtifactJson)
+	suite.context.Request = httptest.NewRequest(http.MethodPost, "/artifact", nil)
 
 	//WHEN
 	suite.artifactController.Post(suite.context)
