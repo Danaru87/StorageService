@@ -3,7 +3,7 @@ package dao
 import "github.com/UPrefer/StorageService/model"
 
 type MockedArtifactDao struct {
-	ExpectedError                    error
+	ExpectedCreateArtifactError      error
 	ExpectedWaitingForUploadArtifact *model.ArtifactDTO
 	ExpectedWaitingForUploadError    error
 	ExpectedAlreadyUploadedArtifact  *model.ArtifactDTO
@@ -15,7 +15,7 @@ func (dao *MockedArtifactDao) FindUploadedArtifact(id string) (*model.ArtifactDT
 }
 
 func (dao *MockedArtifactDao) CreateArtifact(*model.ArtifactDTO) error {
-	return dao.ExpectedError
+	return dao.ExpectedCreateArtifactError
 }
 
 func (dao *MockedArtifactDao) FindWaitingForUploadArtifact(s string) (*model.ArtifactDTO, error) {

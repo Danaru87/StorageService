@@ -43,7 +43,7 @@ func (suite *ArtifactCreationTestSuite) Test_ShouldReturnEncounteredError_WhenDa
 	var expectedArtifactDto *model.ArtifactDTO = nil
 	var expectedError = errors.New("Any Dao Error")
 
-	suite.mockedArtifactDao.ExpectedError = expectedError
+	suite.mockedArtifactDao.ExpectedCreateArtifactError = expectedError
 
 	//WHEN
 	var createdArtifactDto, err = suite.artifactService.CreateArtifact()
