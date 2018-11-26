@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/UPrefer/StorageService/dao"
 	"io"
+	"log"
 )
 
 type IBlobService interface {
@@ -20,16 +21,24 @@ type BlobService struct {
 
 func (blobService *BlobService) SaveBlob(artifactId string, contentType string, reader io.ReadCloser) error {
 	defer reader.Close()
+	var err error
 
-	var alreadyUploadedArtifact, _ = blobService.artifactDao.FindUploadedArtifact(artifactId)
+	alreadyUploadedArtifact, err := blobService.artifactDao.FindUploadedArtifact(artifactId)
 	if alreadyUploadedArtifact != nil {
+		log.Print(err)
 		return ErrArtifactAlreadyUploaded
 	}
 
-	var waitingForUploadArtifact, _ = blobService.artifactDao.FindWaitingForUploadArtifact(artifactId)
+	waitingForUploadArtifact, err := blobService.artifactDao.FindWaitingForUploadArtifact(artifactId)
 	if waitingForUploadArtifact == nil {
+		log.Print(err)
 		return ErrArtifactNofFound
 	}
 
-	return nil
+	err = blobService.blobDao.SaveData(waitingForUploadArtifact, contentType, reader)
+	if err != nil {
+		return err
+	}
+
+	return blobService.artifactDao.DeleteWaitingForUploadArtifact(artifactId)
 }

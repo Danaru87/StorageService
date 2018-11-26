@@ -10,6 +10,7 @@ type IArtifactDao interface {
 	CreateArtifact(*model.ArtifactDTO) error
 	FindWaitingForUploadArtifact(s string) (*model.ArtifactDTO, error)
 	FindUploadedArtifact(id string) (*model.ArtifactDTO, error)
+	DeleteWaitingForUploadArtifact(id string) error
 }
 
 func NewArtifactDao(database *config.Database) *ArtifactDao {
@@ -20,6 +21,10 @@ type ArtifactDao struct {
 	waitingForUploadCollectionName string
 	uploadedCollectionName         string
 	database                       *config.Database
+}
+
+func (dao *ArtifactDao) DeleteWaitingForUploadArtifact(id string) error {
+	panic("implement me")
 }
 
 func (artifactDao *ArtifactDao) FindUploadedArtifact(id string) (*model.ArtifactDTO, error) {

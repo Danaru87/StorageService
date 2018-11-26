@@ -2,7 +2,8 @@ package service
 
 import (
 	"crypto/rand"
-	"github.com/UPrefer/StorageService/dao"
+	"errors"
+	"github.com/UPrefer/StorageService/dao/mocks"
 	"github.com/UPrefer/StorageService/model"
 	"github.com/stretchr/testify/suite"
 	"io"
@@ -15,16 +16,16 @@ type BlobCreationTestSuite struct {
 
 	randomReadCloser io.ReadCloser
 
-	blobDao     *dao.MockedBlobDao
-	artifactDao *dao.MockedArtifactDao
+	blobDao     *mocks.IBlobDao
+	artifactDao *mocks.IArtifactDao
 
 	blobService *BlobService
 }
 
 func (suite *BlobCreationTestSuite) SetupTest() {
 	suite.randomReadCloser = ioutil.NopCloser(io.LimitReader(rand.Reader, 255))
-	suite.blobDao = &dao.MockedBlobDao{}
-	suite.artifactDao = &dao.MockedArtifactDao{}
+	suite.blobDao = &mocks.IBlobDao{}
+	suite.artifactDao = &mocks.IArtifactDao{}
 	suite.blobService = &BlobService{artifactDao: suite.artifactDao, blobDao: suite.blobDao}
 }
 
@@ -32,13 +33,40 @@ func TestBlobCreation(t *testing.T) {
 	suite.Run(t, new(BlobCreationTestSuite))
 }
 
-func (suite *BlobCreationTestSuite) Test_ShouldReturnArtifactNotFoundError_WhenArtifactNotFound() {
+func (suite *BlobCreationTestSuite) Test_ShouldSaveData_AndDeleteArtifactPlaceholder_WhenArtifactWaitsForUpload_AndNoError() {
 	//GIVEN
-	var expectedError = ErrArtifactNofFound
-	suite.artifactDao.ExpectedWaitingForUploadArtifact = nil
+	var (
+		expectedError error = nil
+		contentType         = "application/blob"
+		artifactId          = "artifact1"
+		artifact            = &model.ArtifactDTO{Uuid: artifactId}
+	)
+
+	suite.artifactDao.On("FindWaitingForUploadArtifact", artifactId).Return(artifact, nil)
+	suite.artifactDao.On("FindUploadedArtifact", artifactId).Return(nil, nil)
+	suite.blobDao.On("SaveData", artifact, contentType, suite.randomReadCloser).Return(nil)
+	suite.artifactDao.On("DeleteWaitingForUploadArtifact", artifactId).Return(nil)
 
 	//WHEN
-	var actualError = suite.blobService.SaveBlob("", "", suite.randomReadCloser)
+	var actualError = suite.blobService.SaveBlob(artifactId, contentType, suite.randomReadCloser)
+
+	//THEN
+	suite.Equal(expectedError, actualError)
+	suite.blobDao.AssertCalled(suite.T(), "SaveData", artifact, contentType, suite.randomReadCloser)
+	suite.artifactDao.AssertCalled(suite.T(), "DeleteWaitingForUploadArtifact", artifactId)
+}
+
+func (suite *BlobCreationTestSuite) Test_ShouldReturnArtifactNotFoundError_WhenArtifactNotFound() {
+	//GIVEN
+	var (
+		artifactId    = "artifact1"
+		expectedError = ErrArtifactNofFound
+	)
+	suite.artifactDao.On("FindWaitingForUploadArtifact", artifactId).Return(nil, nil)
+	suite.artifactDao.On("FindUploadedArtifact", artifactId).Return(nil, nil)
+
+	//WHEN
+	var actualError = suite.blobService.SaveBlob(artifactId, "", suite.randomReadCloser)
 
 	//THEN
 	suite.Equal(expectedError, actualError)
@@ -46,29 +74,57 @@ func (suite *BlobCreationTestSuite) Test_ShouldReturnArtifactNotFoundError_WhenA
 
 func (suite *BlobCreationTestSuite) Test_ShouldReturnArtifactAlreadyUploadedError_WhenArtifactAlreadyUploaded() {
 	//GIVEN
-	var expectedError = ErrArtifactAlreadyUploaded
-	suite.artifactDao.ExpectedWaitingForUploadArtifact = nil
-	suite.artifactDao.ExpectedAlreadyUploadedArtifact = &model.ArtifactDTO{}
+	var (
+		artifactId    = "artifact1"
+		expectedError = ErrArtifactAlreadyUploaded
+	)
+	suite.artifactDao.On("FindWaitingForUploadArtifact", artifactId).Return(nil, nil)
+	suite.artifactDao.On("FindUploadedArtifact", artifactId).Return(&model.ArtifactDTO{}, nil)
 
 	//WHEN
-	var actualError = suite.blobService.SaveBlob("", "", suite.randomReadCloser)
+	var actualError = suite.blobService.SaveBlob(artifactId, "", suite.randomReadCloser)
 
 	//THEN
 	suite.Equal(expectedError, actualError)
 }
 
-//func (suite *BlobCreationTestSuite) Test_ShouldSaveData_WhenArtifactWaitsForUpload() {
-//	//GIVEN
-//	var (
-//		expectedError error = nil
-//		expectedArtifactId  = "adfg"
-//		expectedContentType = "application/blob"
-//	)
-//
-//	//WHEN
-//	var actualError = suite.blobService.SaveBlob(expectedArtifactId, expectedContentType, suite.randomReadCloser)
-//
-//	//THEN
-//	suite.Equal(expectedError, actualError)
-//	suite.blobDao.MethodCalled("SaveData", expectedArtifactId, expectedContentType, suite.randomReadCloser)
-//}
+func (suite *BlobCreationTestSuite) Test_ShouldReturnError_WhenSaveDataFails() {
+	//GIVEN
+	var (
+		expectedError = errors.New("unexpected error")
+		artifactId    = "artifactId"
+		artifact      = &model.ArtifactDTO{Uuid: artifactId}
+		contentType   = "application/data"
+	)
+
+	suite.artifactDao.On("FindWaitingForUploadArtifact", artifactId).Return(artifact, nil)
+	suite.artifactDao.On("FindUploadedArtifact", artifactId).Return(nil, nil)
+	suite.blobDao.On("SaveData", artifact, contentType, suite.randomReadCloser).Return(expectedError)
+
+	//WHEN
+	var actualError = suite.blobService.SaveBlob(artifactId, contentType, suite.randomReadCloser)
+
+	//THEN
+	suite.Equal(expectedError, actualError)
+}
+
+func (suite *BlobCreationTestSuite) Test_ShouldReturnError_WhenDeleteArtifactPlaceholderFails() {
+	//GIVEN
+	var (
+		expectedError = errors.New("delete artifact placeholder error")
+		artifactId    = "artifact1"
+		artifact      = &model.ArtifactDTO{Uuid: artifactId}
+		contentType   = "application/data"
+	)
+
+	suite.artifactDao.On("FindWaitingForUploadArtifact", artifactId).Return(artifact, nil)
+	suite.artifactDao.On("FindUploadedArtifact", artifactId).Return(nil, nil)
+	suite.blobDao.On("SaveData", artifact, contentType, suite.randomReadCloser).Return(nil)
+	suite.artifactDao.On("DeleteWaitingForUploadArtifact", artifactId).Return(expectedError)
+
+	//WHEN
+	var actualError = suite.blobService.SaveBlob(artifactId, contentType, suite.randomReadCloser)
+
+	//THEN
+	suite.Equal(expectedError, actualError)
+}

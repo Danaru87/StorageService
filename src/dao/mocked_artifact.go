@@ -10,6 +10,10 @@ type MockedArtifactDao struct {
 	ExpectedAlreadyUploadedError     error
 }
 
+func (dao *MockedArtifactDao) DeleteWaitingForUploadArtifact(id string) error {
+	panic("implement me")
+}
+
 func (dao *MockedArtifactDao) FindUploadedArtifact(id string) (*model.ArtifactDTO, error) {
 	return dao.ExpectedAlreadyUploadedArtifact, dao.ExpectedAlreadyUploadedError
 }
