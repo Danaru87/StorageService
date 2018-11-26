@@ -32,7 +32,7 @@ func TestArtifactRead(t *testing.T) {
 	suite.Run(t, new(ArtifactReadTestSuite))
 }
 
-func (suite *ArtifactReadTestSuite) Test_ShouldReturnHTTP200_AndId_WhenArtifactWaitsForUpload() {
+func (suite *ArtifactReadTestSuite) Test_ShouldReturnHTTP200_AndId_WhenArtifactExists() {
 	//GIVEN
 	var expectedStatus = http.StatusOK
 	var expectedBody = "{\"uuid\":\"a1\"}"

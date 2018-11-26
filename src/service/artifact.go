@@ -20,7 +20,21 @@ type ArtifactService struct {
 }
 
 func (artifactService *ArtifactService) ReadArtifact(id string) (*model.ArtifactDTO, error) {
-	panic("implement me")
+	var (
+		err      error
+		artifact *model.ArtifactDTO
+	)
+
+	artifact, err = artifactService.artifactDao.FindWaitingForUploadArtifact(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if artifact == nil {
+		artifact, err = artifactService.artifactDao.FindUploadedArtifact(id)
+	}
+
+	return artifact, err
 }
 
 func (artifactService *ArtifactService) CreateArtifact() (*model.ArtifactDTO, error) {

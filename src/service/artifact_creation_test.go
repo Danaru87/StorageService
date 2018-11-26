@@ -2,29 +2,22 @@ package service
 
 import (
 	"errors"
+	"github.com/UPrefer/StorageService/dao"
 	"github.com/UPrefer/StorageService/model"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
 
-type MockedArtifactDao struct {
-	expectedError error
-}
-
-func (dao *MockedArtifactDao) CreateArtifact(*model.ArtifactDTO) error {
-	return dao.expectedError
-}
-
 type ArtifactCreationTestSuite struct {
 	suite.Suite
 	mockedUtilsService *MockedUtilsService
-	mockedArtifactDao  *MockedArtifactDao
+	mockedArtifactDao  *dao.MockedArtifactDao
 	artifactService    *ArtifactService
 }
 
 func (suite *ArtifactCreationTestSuite) SetupTest() {
 	suite.mockedUtilsService = &MockedUtilsService{}
-	suite.mockedArtifactDao = &MockedArtifactDao{}
+	suite.mockedArtifactDao = &dao.MockedArtifactDao{}
 	suite.artifactService = NewArtifactService(suite.mockedUtilsService, suite.mockedArtifactDao)
 }
 
@@ -50,7 +43,7 @@ func (suite *ArtifactCreationTestSuite) Test_ShouldReturnEncounteredError_WhenDa
 	var expectedArtifactDto *model.ArtifactDTO = nil
 	var expectedError = errors.New("Any Dao Error")
 
-	suite.mockedArtifactDao.expectedError = expectedError
+	suite.mockedArtifactDao.ExpectedError = expectedError
 
 	//WHEN
 	var createdArtifactDto, err = suite.artifactService.CreateArtifact()

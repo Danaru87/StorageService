@@ -8,11 +8,21 @@ import (
 
 type IArtifactDao interface {
 	CreateArtifact(*model.ArtifactDTO) error
+	FindWaitingForUploadArtifact(s string) (*model.ArtifactDTO, error)
+	FindUploadedArtifact(id string) (*model.ArtifactDTO, error)
 }
 
 type ArtifactDao struct {
 	collectionName string
 	database       *config.Database
+}
+
+func (artifactDao *ArtifactDao) FindUploadedArtifact(id string) (*model.ArtifactDTO, error) {
+	panic("implement me")
+}
+
+func (artifactDao *ArtifactDao) FindWaitingForUploadArtifact(s string) (*model.ArtifactDTO, error) {
+	panic("implement me")
 }
 
 func NewArtifactDao(database *config.Database) *ArtifactDao {
