@@ -30,7 +30,11 @@ func (artifactDao *ArtifactDao) FindUploadedArtifact(id string) (*model.Artifact
 	artifactDao.database.HandleRequest(func(database *mgo.Database) {
 		err = database.C(artifactDao.uploadedCollectionName).FindId(id).One(foundArtifact)
 	})
-	return foundArtifact, err
+	if err == mgo.ErrNotFound {
+		return nil, nil
+	} else {
+		return foundArtifact, err
+	}
 }
 
 func (artifactDao *ArtifactDao) FindWaitingForUploadArtifact(id string) (*model.ArtifactDTO, error) {
@@ -41,7 +45,11 @@ func (artifactDao *ArtifactDao) FindWaitingForUploadArtifact(id string) (*model.
 	artifactDao.database.HandleRequest(func(database *mgo.Database) {
 		err = database.C(artifactDao.waitingForUploadCollectionName).FindId(id).One(foundArtifact)
 	})
-	return foundArtifact, err
+	if err == mgo.ErrNotFound {
+		return nil, nil
+	} else {
+		return foundArtifact, err
+	}
 }
 
 func (artifactDao *ArtifactDao) CreateArtifact(artifactDto *model.ArtifactDTO) error {

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/UPrefer/StorageService/dao"
 	"github.com/UPrefer/StorageService/model"
-	"github.com/globalsign/mgo"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -71,7 +70,6 @@ func (suite *ArtifactReadTestSuite) Test_ShouldReturnArtifact_WhenFindAlreadyUpl
 		expectedError    error = nil
 	)
 
-	suite.mockedArtifactDao.ExpectedWaitingForUploadError = mgo.ErrNotFound
 	suite.mockedArtifactDao.ExpectedAlreadyUploadedArtifact = expectedArtifact
 
 	//WHEN
@@ -89,8 +87,25 @@ func (suite *ArtifactReadTestSuite) Test_ShouldReturnError_WhenFindAlreadyUpload
 		expectedError                       = errors.New("findAlreadyUploadedError")
 	)
 
-	suite.mockedArtifactDao.ExpectedWaitingForUploadError = mgo.ErrNotFound
 	suite.mockedArtifactDao.ExpectedAlreadyUploadedError = expectedError
+
+	//WHEN
+	var actualArtifact, actualError = suite.artifactService.ReadArtifact(suite.artifactId)
+
+	//THEN
+	suite.Equal(expectedArtifact, actualArtifact)
+	suite.Equal(expectedError, actualError)
+}
+
+func (suite *ArtifactReadTestSuite) Test_ShouldReturnNil_WhenNoArtifactFound() {
+	//GIVEN
+	var (
+		expectedArtifact *model.ArtifactDTO = nil
+		expectedError    error              = nil
+	)
+
+	suite.mockedArtifactDao.ExpectedWaitingForUploadArtifact = nil
+	suite.mockedArtifactDao.ExpectedAlreadyUploadedArtifact = nil
 
 	//WHEN
 	var actualArtifact, actualError = suite.artifactService.ReadArtifact(suite.artifactId)
