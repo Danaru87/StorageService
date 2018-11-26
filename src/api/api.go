@@ -15,11 +15,14 @@ func Handlers() *gin.Engine {
 		database = config.NewDatabase("mongodb://root:root@localhost:27017", "StorageService")
 
 		artifactDao = dao.NewArtifactDao(database)
+		blobDao     = dao.NewMongoBlobDao(database)
 
 		utilsService    = service.NewUtilsService()
 		artifactService = service.NewArtifactService(utilsService, artifactDao)
+		blobService     = service.NewBlobService(blobDao)
 
 		artifactController = controller.NewArtifactController(artifactService)
+		blobController     = controller.NewBlobController(blobService)
 	)
 
 	v1 := engine.Group("/v1")
@@ -32,6 +35,11 @@ func Handlers() *gin.Engine {
 		artifactResource := artifactGroup.Group(":artifact_id")
 		{
 			artifactResource.GET("", artifactController.Get)
+		}
+
+		blobResource := artifactResource.Group("/blob")
+		{
+			blobResource.PUT("", blobController.Put)
 		}
 	}
 	return engine

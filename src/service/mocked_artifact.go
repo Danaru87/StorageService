@@ -7,6 +7,7 @@ import (
 
 type MockedArtifactService struct {
 	mock.Mock
+
 	CreateArtifact_ExpectedArtifact *model.ArtifactDTO
 	CreateArtifact_ExpectedError    error
 	ReadArtifact_ExpectedArtifact   *model.ArtifactDTO
