@@ -12,27 +12,42 @@ type IArtifactDao interface {
 	FindUploadedArtifact(id string) (*model.ArtifactDTO, error)
 }
 
+func NewArtifactDao(database *config.Database) *ArtifactDao {
+	return &ArtifactDao{uploadedCollectionName: "artifact", waitingForUploadCollectionName: "artifact.waitingForUpload", database: database}
+}
+
 type ArtifactDao struct {
-	collectionName string
-	database       *config.Database
+	waitingForUploadCollectionName string
+	uploadedCollectionName         string
+	database                       *config.Database
 }
 
 func (artifactDao *ArtifactDao) FindUploadedArtifact(id string) (*model.ArtifactDTO, error) {
-	panic("implement me")
+	var (
+		foundArtifact = &model.ArtifactDTO{}
+		err           error
+	)
+	artifactDao.database.HandleRequest(func(database *mgo.Database) {
+		err = database.C(artifactDao.uploadedCollectionName).FindId(id).One(foundArtifact)
+	})
+	return foundArtifact, err
 }
 
-func (artifactDao *ArtifactDao) FindWaitingForUploadArtifact(s string) (*model.ArtifactDTO, error) {
-	panic("implement me")
-}
-
-func NewArtifactDao(database *config.Database) *ArtifactDao {
-	return &ArtifactDao{collectionName: "artifact", database: database}
+func (artifactDao *ArtifactDao) FindWaitingForUploadArtifact(id string) (*model.ArtifactDTO, error) {
+	var (
+		foundArtifact = &model.ArtifactDTO{}
+		err           error
+	)
+	artifactDao.database.HandleRequest(func(database *mgo.Database) {
+		err = database.C(artifactDao.waitingForUploadCollectionName).FindId(id).One(foundArtifact)
+	})
+	return foundArtifact, err
 }
 
 func (artifactDao *ArtifactDao) CreateArtifact(artifactDto *model.ArtifactDTO) error {
 	var err error = nil
 	artifactDao.database.HandleRequest(func(database *mgo.Database) {
-		err = database.C(artifactDao.collectionName).Insert(artifactDto)
+		err = database.C(artifactDao.waitingForUploadCollectionName).Insert(artifactDto)
 	})
 	return err
 }

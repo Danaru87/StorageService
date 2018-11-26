@@ -24,9 +24,14 @@ func Handlers() *gin.Engine {
 
 	v1 := engine.Group("/v1")
 	{
-		artifactResource := v1.Group("/artifact")
+		artifactGroup := v1.Group("/artifact")
 		{
-			artifactResource.POST("", artifactController.Post)
+			artifactGroup.POST("", artifactController.Post)
+		}
+
+		artifactResource := artifactGroup.Group(":artifact_id")
+		{
+			artifactResource.GET("", artifactController.Get)
 		}
 	}
 	return engine

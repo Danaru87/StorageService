@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/UPrefer/StorageService/dao"
 	"github.com/UPrefer/StorageService/model"
+	"github.com/globalsign/mgo"
 )
 
 type IArtifactService interface {
@@ -26,11 +27,11 @@ func (artifactService *ArtifactService) ReadArtifact(id string) (*model.Artifact
 	)
 
 	artifact, err = artifactService.artifactDao.FindWaitingForUploadArtifact(id)
-	if err != nil {
+	if err != nil && err != mgo.ErrNotFound {
 		return nil, err
 	}
 
-	if artifact == nil {
+	if err != nil {
 		artifact, err = artifactService.artifactDao.FindUploadedArtifact(id)
 	}
 

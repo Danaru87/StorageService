@@ -39,6 +39,7 @@ func (artifactController *ArtifactController) Get(ctx *gin.Context) {
 	var foundArtifact, err = artifactController.artifactService.ReadArtifact(ctx.Param("artifact_id"))
 
 	if err != nil {
+		log.Print(err)
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
