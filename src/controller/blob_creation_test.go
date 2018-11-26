@@ -40,7 +40,24 @@ func (suite *BlobCreationTestSuite) Test_ShouldReturnHttp404_AndEmptyBody_WhenAr
 		expectedBody   = ""
 	)
 
-	suite.mockedBlobService.ExpectedSaveBlobError = service.ErrArtifactNofFound
+	suite.mockedBlobService.ExpectedSaveBlobError = service.ErrArtifactNotFound
+
+	//WHEN
+	suite.blobController.Put(suite.context)
+
+	//THEN
+	suite.Equal(expectedStatus, suite.context.Writer.Status())
+	suite.Equal(expectedBody, suite.httpRecorder.Body.String())
+}
+
+func (suite *BlobCreationTestSuite) Test_ShouldReturnHttp409_AndEmptyBody_WhenArtifactAlreadyUploaded() {
+	//GIVEN
+	var (
+		expectedStatus = http.StatusConflict
+		expectedBody   = ""
+	)
+
+	suite.mockedBlobService.ExpectedSaveBlobError = service.ErrArtifactAlreadyUploaded
 
 	//WHEN
 	suite.blobController.Put(suite.context)

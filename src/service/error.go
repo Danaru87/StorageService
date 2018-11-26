@@ -5,6 +5,6 @@ import (
 )
 
 var (
-	ErrArtifactNofFound        = errors.New("Artifact not found")
+	ErrArtifactNotFound        = errors.New("Artifact not found")
 	ErrArtifactAlreadyUploaded = errors.New("Artifact already uploaded")
 )

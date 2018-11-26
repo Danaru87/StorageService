@@ -60,7 +60,7 @@ func (suite *BlobCreationTestSuite) Test_ShouldReturnArtifactNotFoundError_WhenA
 	//GIVEN
 	var (
 		artifactId    = "artifact1"
-		expectedError = ErrArtifactNofFound
+		expectedError = ErrArtifactNotFound
 	)
 	suite.artifactDao.On("FindWaitingForUploadArtifact", artifactId).Return(nil, nil)
 	suite.artifactDao.On("FindUploadedArtifact", artifactId).Return(nil, nil)

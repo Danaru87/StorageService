@@ -10,8 +10,8 @@ type IBlobService interface {
 	SaveBlob(artifactID string, contentType string, reader io.ReadCloser) error
 }
 
-func NewBlobService(blobDao dao.IBlobDao) *BlobService {
-	return &BlobService{blobDao: blobDao}
+func NewBlobService(blobDao dao.IBlobDao, artifactDao dao.IArtifactDao) *BlobService {
+	return &BlobService{blobDao: blobDao, artifactDao: artifactDao}
 }
 
 type BlobService struct {
@@ -32,7 +32,7 @@ func (blobService *BlobService) SaveBlob(artifactId string, contentType string, 
 	waitingForUploadArtifact, err := blobService.artifactDao.FindWaitingForUploadArtifact(artifactId)
 	if waitingForUploadArtifact == nil {
 		log.Print(err)
-		return ErrArtifactNofFound
+		return ErrArtifactNotFound
 	}
 
 	err = blobService.blobDao.SaveData(waitingForUploadArtifact, contentType, reader)

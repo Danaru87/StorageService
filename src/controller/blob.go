@@ -15,10 +15,15 @@ func NewBlobController(blobService service.IBlobService) *BlobController {
 }
 
 func (blobController *BlobController) Put(ctx *gin.Context) {
-	var err = blobController.blobService.SaveBlob(ctx.Param("artifactId"), ctx.GetHeader("Content-Type"), ctx.Request.Body)
+	var err = blobController.blobService.SaveBlob(ctx.Param("artifact_id"), ctx.GetHeader("Content-Type"), ctx.Request.Body)
 
-	if err == service.ErrArtifactNofFound {
+	if err == service.ErrArtifactNotFound {
 		ctx.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	if err == service.ErrArtifactAlreadyUploaded {
+		ctx.AbortWithStatus(http.StatusConflict)
 		return
 	}
 

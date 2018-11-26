@@ -4,6 +4,7 @@ import (
 	"github.com/UPrefer/StorageService/config"
 	"github.com/UPrefer/StorageService/model"
 	"github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
 )
 
 type IArtifactDao interface {
@@ -24,7 +25,12 @@ type ArtifactDao struct {
 }
 
 func (dao *ArtifactDao) DeleteWaitingForUploadArtifact(id string) error {
-	panic("implement me")
+	var err error
+
+	dao.database.HandleRequest(func(database *mgo.Database) {
+		err = database.C(dao.waitingForUploadCollectionName).RemoveId(id)
+	})
+	return err
 }
 
 func (artifactDao *ArtifactDao) FindUploadedArtifact(id string) (*model.ArtifactDTO, error) {
@@ -33,7 +39,7 @@ func (artifactDao *ArtifactDao) FindUploadedArtifact(id string) (*model.Artifact
 		err           error
 	)
 	artifactDao.database.HandleRequest(func(database *mgo.Database) {
-		err = database.C(artifactDao.uploadedCollectionName).FindId(id).One(foundArtifact)
+		err = database.GridFS(artifactDao.uploadedCollectionName).Find(bson.M{"_id": id}).One(foundArtifact)
 	})
 	if err == mgo.ErrNotFound {
 		return nil, nil

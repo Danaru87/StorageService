@@ -19,7 +19,7 @@ func Handlers() *gin.Engine {
 
 		utilsService    = service.NewUtilsService()
 		artifactService = service.NewArtifactService(utilsService, artifactDao)
-		blobService     = service.NewBlobService(blobDao)
+		blobService     = service.NewBlobService(blobDao, artifactDao)
 
 		artifactController = controller.NewArtifactController(artifactService)
 		blobController     = controller.NewBlobController(blobService)
