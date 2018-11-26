@@ -8,7 +8,7 @@ import (
 
 type IArtifactDao interface {
 	CreateArtifact(*model.ArtifactDTO) error
-	FindWaitingForUploadArtifact(s string) (*model.ArtifactDTO, error)
+	FindWaitingForUploadArtifact(id string) (*model.ArtifactDTO, error)
 	FindUploadedArtifact(id string) (*model.ArtifactDTO, error)
 	DeleteWaitingForUploadArtifact(id string) error
 }

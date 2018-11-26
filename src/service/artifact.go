@@ -47,7 +47,7 @@ func (artifactService *ArtifactService) CreateArtifact() (*model.ArtifactDTO, er
 
 	err = artifactService.artifactDao.CreateArtifact(artifactDto)
 	if err != nil {
-		return nil, err
+		return artifactDto, err
 	}
 	return artifactDto, nil
 }

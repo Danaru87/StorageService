@@ -3,7 +3,7 @@ package service
 import (
 	"crypto/rand"
 	"errors"
-	"github.com/UPrefer/StorageService/dao/mocks"
+	"github.com/UPrefer/StorageService/mocks"
 	"github.com/UPrefer/StorageService/model"
 	"github.com/stretchr/testify/suite"
 	"io"

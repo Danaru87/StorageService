@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-	"github.com/UPrefer/StorageService/dao"
+	"github.com/UPrefer/StorageService/mocks"
 	"github.com/UPrefer/StorageService/model"
 	"github.com/stretchr/testify/suite"
 	"testing"
@@ -14,14 +14,14 @@ type ArtifactReadTestSuite struct {
 	artifactId string
 
 	mockedUtilsService *MockedUtilsService
-	mockedArtifactDao  *dao.MockedArtifactDao
+	mockedArtifactDao  *mocks.IArtifactDao
 	artifactService    *ArtifactService
 }
 
 func (suite *ArtifactReadTestSuite) SetupTest() {
 	suite.artifactId = "artifactId"
 	suite.mockedUtilsService = &MockedUtilsService{}
-	suite.mockedArtifactDao = &dao.MockedArtifactDao{}
+	suite.mockedArtifactDao = &mocks.IArtifactDao{}
 	suite.artifactService = &ArtifactService{utilsService: suite.mockedUtilsService, artifactDao: suite.mockedArtifactDao}
 }
 
@@ -36,7 +36,7 @@ func (suite *ArtifactReadTestSuite) Test_ShouldReturnArtifact_WhenWaitingForUplo
 		expectedError    error = nil
 	)
 
-	suite.mockedArtifactDao.ExpectedWaitingForUploadArtifact = expectedArtifact
+	suite.mockedArtifactDao.On("FindWaitingForUploadArtifact", suite.artifactId).Return(expectedArtifact, expectedError)
 
 	//WHEN
 	var actualArtifact, actualError = suite.artifactService.ReadArtifact(suite.artifactId)
@@ -53,7 +53,7 @@ func (suite *ArtifactReadTestSuite) Test_ShouldReturnError_WhenFindWaitingForUpl
 		expectedError                       = errors.New("findWaitingForUploadError")
 	)
 
-	suite.mockedArtifactDao.ExpectedWaitingForUploadError = expectedError
+	suite.mockedArtifactDao.On("FindWaitingForUploadArtifact", suite.artifactId).Return(expectedArtifact, expectedError)
 
 	//WHEN
 	var actualArtifact, actualError = suite.artifactService.ReadArtifact(suite.artifactId)
@@ -70,7 +70,8 @@ func (suite *ArtifactReadTestSuite) Test_ShouldReturnArtifact_WhenFindAlreadyUpl
 		expectedError    error = nil
 	)
 
-	suite.mockedArtifactDao.ExpectedAlreadyUploadedArtifact = expectedArtifact
+	suite.mockedArtifactDao.On("FindWaitingForUploadArtifact", suite.artifactId).Return(nil, nil)
+	suite.mockedArtifactDao.On("FindUploadedArtifact", suite.artifactId).Return(expectedArtifact, expectedError)
 
 	//WHEN
 	var actualArtifact, actualError = suite.artifactService.ReadArtifact(suite.artifactId)
@@ -87,7 +88,8 @@ func (suite *ArtifactReadTestSuite) Test_ShouldReturnError_WhenFindAlreadyUpload
 		expectedError                       = errors.New("findAlreadyUploadedError")
 	)
 
-	suite.mockedArtifactDao.ExpectedAlreadyUploadedError = expectedError
+	suite.mockedArtifactDao.On("FindWaitingForUploadArtifact", suite.artifactId).Return(nil, nil)
+	suite.mockedArtifactDao.On("FindUploadedArtifact", suite.artifactId).Return(expectedArtifact, expectedError)
 
 	//WHEN
 	var actualArtifact, actualError = suite.artifactService.ReadArtifact(suite.artifactId)
@@ -104,8 +106,8 @@ func (suite *ArtifactReadTestSuite) Test_ShouldReturnNil_WhenNoArtifactFound() {
 		expectedError    error              = nil
 	)
 
-	suite.mockedArtifactDao.ExpectedWaitingForUploadArtifact = nil
-	suite.mockedArtifactDao.ExpectedAlreadyUploadedArtifact = nil
+	suite.mockedArtifactDao.On("FindWaitingForUploadArtifact", suite.artifactId).Return(nil, nil)
+	suite.mockedArtifactDao.On("FindUploadedArtifact", suite.artifactId).Return(nil, nil)
 
 	//WHEN
 	var actualArtifact, actualError = suite.artifactService.ReadArtifact(suite.artifactId)
