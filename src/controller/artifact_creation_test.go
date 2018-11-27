@@ -2,8 +2,8 @@ package controller
 
 import (
 	"errors"
+	"github.com/UPrefer/StorageService/mocks"
 	"github.com/UPrefer/StorageService/model"
-	"github.com/UPrefer/StorageService/service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 	"net/http"
@@ -16,12 +16,12 @@ type ArtifactCreationTestSuite struct {
 
 	context               *gin.Context
 	httpRecorder          *httptest.ResponseRecorder
-	mockedArtifactService *service.MockedArtifactService
+	mockedArtifactService *mocks.IArtifactService
 	artifactController    *ArtifactController
 }
 
 func (suite *ArtifactCreationTestSuite) SetupTest() {
-	suite.mockedArtifactService = new(service.MockedArtifactService)
+	suite.mockedArtifactService = &mocks.IArtifactService{}
 	suite.artifactController = NewArtifactController(suite.mockedArtifactService)
 	suite.httpRecorder = httptest.NewRecorder()
 	suite.context, _ = gin.CreateTestContext(suite.httpRecorder)
@@ -33,11 +33,13 @@ func TestArtifactCreation(t *testing.T) {
 
 func (suite *ArtifactCreationTestSuite) Test_ShouldSetStatusHttp201_AndEmptyBody_AndLocationHeader_WhenCreationOk() {
 	//GIVEN
-	var expectedStatus = http.StatusCreated
-	var expectedBody = ""
-	var expectedLocationHeader = "/artifact/0000-1111-2222-3333"
+	var (
+		expectedStatus         = http.StatusCreated
+		expectedBody           = ""
+		expectedLocationHeader = "/artifact/0000-1111-2222-3333"
+	)
 
-	suite.mockedArtifactService.CreateArtifact_ExpectedArtifact = &model.ArtifactDTO{Uuid: "0000-1111-2222-3333"}
+	suite.mockedArtifactService.On("CreateArtifact").Return(&model.ArtifactDTO{Uuid: "0000-1111-2222-3333"}, nil)
 
 	suite.context.Request = httptest.NewRequest(http.MethodPost, "/artifact", nil)
 
@@ -52,10 +54,12 @@ func (suite *ArtifactCreationTestSuite) Test_ShouldSetStatusHttp201_AndEmptyBody
 
 func (suite *ArtifactCreationTestSuite) Test_ShouldSetStatusHttp500_AndEmptyBody_WhenCreationFails() {
 	//GIVEN
-	var expectedStatus = http.StatusInternalServerError
-	var expectedBody = ""
+	var (
+		expectedStatus = http.StatusInternalServerError
+		expectedBody   = ""
+	)
 
-	suite.mockedArtifactService.CreateArtifact_ExpectedError = errors.New("random failure")
+	suite.mockedArtifactService.On("CreateArtifact").Return(nil, errors.New("random failure"))
 
 	suite.context.Request = httptest.NewRequest(http.MethodPost, "/artifact", nil)
 

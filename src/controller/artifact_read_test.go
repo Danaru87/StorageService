@@ -2,8 +2,8 @@ package controller
 
 import (
 	"errors"
+	"github.com/UPrefer/StorageService/mocks"
 	"github.com/UPrefer/StorageService/model"
-	"github.com/UPrefer/StorageService/service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 	"net/http"
@@ -14,18 +14,23 @@ import (
 type ArtifactReadTestSuite struct {
 	suite.Suite
 
+	artifactId string
+
 	context               *gin.Context
 	httpRecorder          *httptest.ResponseRecorder
-	mockedArtifactService *service.MockedArtifactService
+	mockedArtifactService *mocks.IArtifactService
 	artifactController    *ArtifactController
 }
 
 func (suite *ArtifactReadTestSuite) SetupTest() {
-	suite.mockedArtifactService = &service.MockedArtifactService{}
+	suite.artifactId = "artifact1"
+
+	suite.mockedArtifactService = &mocks.IArtifactService{}
 	suite.artifactController = &ArtifactController{artifactService: suite.mockedArtifactService}
 
 	suite.httpRecorder = httptest.NewRecorder()
 	suite.context, _ = gin.CreateTestContext(suite.httpRecorder)
+	suite.context.Params = []gin.Param{{"artifact_id", suite.artifactId}}
 }
 
 func TestArtifactRead(t *testing.T) {
@@ -34,13 +39,12 @@ func TestArtifactRead(t *testing.T) {
 
 func (suite *ArtifactReadTestSuite) Test_ShouldReturnHTTP200_AndId_WhenArtifactExists() {
 	//GIVEN
-	var expectedStatus = http.StatusOK
-	var expectedBody = "{\"uuid\":\"a1\"}"
+	var (
+		expectedStatus = http.StatusOK
+		expectedBody   = "{\"uuid\":\"artifact1\"}"
+	)
 
-	suite.mockedArtifactService.ReadArtifact_ExpectedArtifact = &model.ArtifactDTO{Uuid: "a1"}
-	suite.mockedArtifactService.ReadArtifact_ExpectedError = nil
-
-	suite.context.Params = []gin.Param{{Key: "artifact_id", Value: "a1"}}
+	suite.mockedArtifactService.On("ReadArtifact", suite.artifactId).Return(&model.ArtifactDTO{Uuid: suite.artifactId}, nil)
 
 	//WHEN
 	suite.artifactController.Get(suite.context)
@@ -52,11 +56,12 @@ func (suite *ArtifactReadTestSuite) Test_ShouldReturnHTTP200_AndId_WhenArtifactE
 
 func (suite *ArtifactReadTestSuite) Test_ShouldReturnHTTP404_AndEmptyBody_WhenArtifactDoesNotExist() {
 	//GIVEN
-	var expectedStatus = http.StatusNotFound
-	var expectedBody = ""
+	var (
+		expectedStatus = http.StatusNotFound
+		expectedBody   = ""
+	)
 
-	suite.mockedArtifactService.ReadArtifact_ExpectedError = nil
-	suite.mockedArtifactService.ReadArtifact_ExpectedArtifact = nil
+	suite.mockedArtifactService.On("ReadArtifact", suite.artifactId).Return(nil, nil)
 
 	//WHEN
 	suite.artifactController.Get(suite.context)
@@ -68,11 +73,12 @@ func (suite *ArtifactReadTestSuite) Test_ShouldReturnHTTP404_AndEmptyBody_WhenAr
 
 func (suite *ArtifactReadTestSuite) Test_ShouldReturHTTP500_AndEmptyBody_WhenGetArtifactFails() {
 	//GIVEN
-	var expectedStatus = http.StatusInternalServerError
-	var expectedBody = ""
+	var (
+		expectedStatus = http.StatusInternalServerError
+		expectedBody   = ""
+	)
 
-	suite.mockedArtifactService.ReadArtifact_ExpectedArtifact = nil
-	suite.mockedArtifactService.ReadArtifact_ExpectedError = errors.New("random error")
+	suite.mockedArtifactService.On("ReadArtifact", suite.artifactId).Return(nil, errors.New("random error"))
 
 	//WHEN
 	suite.artifactController.Get(suite.context)
