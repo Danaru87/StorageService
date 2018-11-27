@@ -13,14 +13,14 @@ type ArtifactReadTestSuite struct {
 
 	artifactId string
 
-	mockedUtilsService *MockedUtilsService
+	mockedUtilsService *mocks.IUtilsService
 	mockedArtifactDao  *mocks.IArtifactDao
 	artifactService    *ArtifactService
 }
 
 func (suite *ArtifactReadTestSuite) SetupTest() {
 	suite.artifactId = "artifactId"
-	suite.mockedUtilsService = &MockedUtilsService{}
+	suite.mockedUtilsService = &mocks.IUtilsService{}
 	suite.mockedArtifactDao = &mocks.IArtifactDao{}
 	suite.artifactService = &ArtifactService{utilsService: suite.mockedUtilsService, artifactDao: suite.mockedArtifactDao}
 }
