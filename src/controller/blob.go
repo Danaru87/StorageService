@@ -34,14 +34,10 @@ func (blobController *BlobController) Put(ctx *gin.Context) {
 	if err == service.ErrArtifactNotFound {
 		ctx.AbortWithStatus(http.StatusNotFound)
 		return
-	}
-
-	if err == service.ErrArtifactAlreadyUploaded {
+	} else if err == service.ErrArtifactAlreadyUploaded {
 		ctx.AbortWithStatus(http.StatusConflict)
 		return
-	}
-
-	if err != nil {
+	} else if err != nil {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}

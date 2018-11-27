@@ -9,7 +9,7 @@ import (
 
 type IBlobDao interface {
 	SaveData(dto *model.ArtifactDTO, contentType string, reader io.Reader) error
-	ReadData(contentType string) (io.ReadCloser, error)
+	ReadData(artifactId string) (io.ReadCloser, error)
 }
 
 func NewMongoBlobDao(database *config.Database) *MongoBlobDao {

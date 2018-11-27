@@ -20,8 +20,27 @@ type BlobService struct {
 	artifactDao dao.IArtifactDao
 }
 
-func (blobService *BlobService) ReadBlob(artifactId string) (contentType string, length int64, reader io.ReadCloser, err error) {
-	panic("implement me")
+func (blobService *BlobService) ReadBlob(artifactId string) (contentType string, length int64, reader io.ReadCloser, resultError error) {
+
+	artifactDto, resultError := blobService.artifactDao.FindUploadedArtifact(artifactId)
+
+	if artifactDto == nil {
+		resultError = ErrArtifactNotFound
+	}
+
+	if resultError == nil {
+		reader, resultError = blobService.blobDao.ReadData(artifactId)
+
+		if reader == nil {
+			resultError = ErrArtifactNotFound
+		}
+	}
+
+	if resultError != nil {
+		return "", 0, nil, resultError
+	}
+
+	return artifactDto.ContentType, artifactDto.Length, reader, resultError
 }
 
 func (blobService *BlobService) SaveBlob(artifactId string, contentType string, reader io.ReadCloser) error {
