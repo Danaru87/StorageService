@@ -7,6 +7,21 @@ import (
 	"time"
 )
 
+type GridFileReadCloser struct {
+	gridFile *mgo.GridFile
+	session  *mgo.Session
+}
+
+func (readCloser *GridFileReadCloser) Close() error {
+	var err = readCloser.gridFile.Close()
+	readCloser.session.Close()
+	return err
+}
+
+func (readCloser *GridFileReadCloser) Read(p []byte) (n int, err error) {
+	return readCloser.gridFile.Read(p)
+}
+
 type Request func(*mgo.Database)
 
 type Database struct {
@@ -30,6 +45,12 @@ func NewDatabase(url string, databaseName string) *Database {
 	log.Println("DB : Connexion succeed !")
 
 	return &Database{session: session, databaseName: databaseName}
+}
+
+func (database *Database) OpenGridFsReader(prefix string, objectId string) (*GridFileReadCloser, error) {
+	var newSession = database.session.Copy()
+	var fileReader, err = newSession.DB(database.databaseName).GridFS(prefix).OpenId(objectId)
+	return &GridFileReadCloser{session: newSession, gridFile: fileReader}, err
 }
 
 func (database *Database) HandleRequest(request Request) {

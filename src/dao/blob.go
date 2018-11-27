@@ -21,12 +21,14 @@ type MongoBlobDao struct {
 	database       *config.Database
 }
 
-func (artifactDao *MongoBlobDao) ReadData(artifactId string) (io.ReadCloser, error) {
-	//var gridFile, err
-	//artifactDao.database.HandleRequest(func(database *mgo.Database) {
-	//	gridFile, err = database.GridFS(artifactDao.collectionName).OpenId(artifactId)
-	//})
-	panic("implement me")
+func (artifactDao *MongoBlobDao) ReadData(artifactId string) (reader io.ReadCloser, err error) {
+	reader, err = artifactDao.database.OpenGridFsReader(artifactDao.collectionName, artifactId)
+
+	if err == mgo.ErrNotFound {
+		err = nil
+		reader = nil
+	}
+	return reader, err
 }
 
 func (artifactDao *MongoBlobDao) SaveData(artifactDto *model.ArtifactDTO, contentType string, reader io.Reader) error {
@@ -39,15 +41,10 @@ func (artifactDao *MongoBlobDao) SaveData(artifactDto *model.ArtifactDTO, conten
 			createdFile.SetId(artifactDto.Uuid)
 			createdFile.SetContentType(contentType)
 
-			var fileChunk = make([]byte, 255)
-			var readErr error
-			for readErr == nil {
-				_, readErr = reader.Read(fileChunk)
-				createdFile.Write(fileChunk)
-			}
+			var _, copyErr = io.Copy(createdFile, reader)
 
-			if readErr != io.EOF {
-				err = readErr
+			if copyErr != io.EOF {
+				err = copyErr
 			}
 
 			err = createdFile.Close()
