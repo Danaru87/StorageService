@@ -9,6 +9,7 @@ import (
 
 type IBlobDao interface {
 	SaveData(dto *model.ArtifactDTO, contentType string, reader io.Reader) error
+	ReadData(contentType string) (io.ReadCloser, error)
 }
 
 func NewMongoBlobDao(database *config.Database) *MongoBlobDao {
@@ -18,6 +19,14 @@ func NewMongoBlobDao(database *config.Database) *MongoBlobDao {
 type MongoBlobDao struct {
 	collectionName string
 	database       *config.Database
+}
+
+func (artifactDao *MongoBlobDao) ReadData(artifactId string) (io.ReadCloser, error) {
+	//var gridFile, err
+	//artifactDao.database.HandleRequest(func(database *mgo.Database) {
+	//	gridFile, err = database.GridFS(artifactDao.collectionName).OpenId(artifactId)
+	//})
+	panic("implement me")
 }
 
 func (artifactDao *MongoBlobDao) SaveData(artifactDto *model.ArtifactDTO, contentType string, reader io.Reader) error {

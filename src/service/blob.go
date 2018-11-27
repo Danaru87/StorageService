@@ -8,6 +8,7 @@ import (
 
 type IBlobService interface {
 	SaveBlob(artifactID string, contentType string, reader io.ReadCloser) error
+	ReadBlob(artifactId string) (contentType string, length int64, reader io.ReadCloser, err error)
 }
 
 func NewBlobService(blobDao dao.IBlobDao, artifactDao dao.IArtifactDao) *BlobService {
@@ -17,6 +18,10 @@ func NewBlobService(blobDao dao.IBlobDao, artifactDao dao.IArtifactDao) *BlobSer
 type BlobService struct {
 	blobDao     dao.IBlobDao
 	artifactDao dao.IArtifactDao
+}
+
+func (blobService *BlobService) ReadBlob(artifactId string) (contentType string, length int64, reader io.ReadCloser, err error) {
+	panic("implement me")
 }
 
 func (blobService *BlobService) SaveBlob(artifactId string, contentType string, reader io.ReadCloser) error {

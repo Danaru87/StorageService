@@ -10,6 +10,43 @@ type IBlobService struct {
 	mock.Mock
 }
 
+// ReadBlob provides a mock function with given fields: artifactId
+func (_m *IBlobService) ReadBlob(artifactId string) (string, int64, io.ReadCloser, error) {
+	ret := _m.Called(artifactId)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(string) string); ok {
+		r0 = rf(artifactId)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 int64
+	if rf, ok := ret.Get(1).(func(string) int64); ok {
+		r1 = rf(artifactId)
+	} else {
+		r1 = ret.Get(1).(int64)
+	}
+
+	var r2 io.ReadCloser
+	if rf, ok := ret.Get(2).(func(string) io.ReadCloser); ok {
+		r2 = rf(artifactId)
+	} else {
+		if ret.Get(2) != nil {
+			r2 = ret.Get(2).(io.ReadCloser)
+		}
+	}
+
+	var r3 error
+	if rf, ok := ret.Get(3).(func(string) error); ok {
+		r3 = rf(artifactId)
+	} else {
+		r3 = ret.Error(3)
+	}
+
+	return r0, r1, r2, r3
+}
+
 // SaveBlob provides a mock function with given fields: artifactID, contentType, reader
 func (_m *IBlobService) SaveBlob(artifactID string, contentType string, reader io.ReadCloser) error {
 	ret := _m.Called(artifactID, contentType, reader)

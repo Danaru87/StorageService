@@ -11,6 +11,29 @@ type IBlobDao struct {
 	mock.Mock
 }
 
+// ReadData provides a mock function with given fields: contentType
+func (_m *IBlobDao) ReadData(contentType string) (io.ReadCloser, error) {
+	ret := _m.Called(contentType)
+
+	var r0 io.ReadCloser
+	if rf, ok := ret.Get(0).(func(string) io.ReadCloser); ok {
+		r0 = rf(contentType)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(io.ReadCloser)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(contentType)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // SaveData provides a mock function with given fields: dto, contentType, reader
 func (_m *IBlobDao) SaveData(dto *model.ArtifactDTO, contentType string, reader io.Reader) error {
 	ret := _m.Called(dto, contentType, reader)

@@ -40,6 +40,7 @@ func Handlers() *gin.Engine {
 		blobResource := artifactResource.Group("/blob")
 		{
 			blobResource.PUT("", blobController.Put)
+			blobResource.GET("", blobController.Get)
 		}
 	}
 	return engine
