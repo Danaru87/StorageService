@@ -16,3 +16,15 @@ $ docker run --rm storage_service:latest
 $ go get github.com/UPrefer/StorageService
 $ ${GO_PATH}/bin/StorageService
 ```
+
+## Hacking
+
+### Running 
+
+### Release new version
+
+Versions names respect the following naming : `vx.y.z`
+
+```bash
+$ docker build -t uprefer/storageservice:<version> .
+```
