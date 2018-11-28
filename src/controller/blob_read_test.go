@@ -24,11 +24,12 @@ type BlobReadTestSuite struct {
 	blobService    *mocks.IBlobService
 	blobController *BlobController
 
-	randomReadCloser io.ReadCloser
+	contentReadCloser io.ReadCloser
 
 	content       []byte
 	contentType   string
 	contentLength int64
+	fileName      string
 	artifactId    string
 }
 
@@ -37,8 +38,8 @@ func (suite *BlobReadTestSuite) SetupTest() {
 	suite.contentType = "application/data"
 	suite.content = []byte("pouet")
 	suite.contentLength = int64(len(suite.content))
-
-	suite.randomReadCloser = ioutil.NopCloser(bytes.NewReader(suite.content))
+	suite.fileName = "fileName1"
+	suite.contentReadCloser = ioutil.NopCloser(bytes.NewReader(suite.content))
 
 	suite.httpRecorder = httptest.NewRecorder()
 	suite.context, _ = gin.CreateTestContext(suite.httpRecorder)
@@ -54,13 +55,13 @@ func TestBlobRead(t *testing.T) {
 	suite.Run(t, new(BlobReadTestSuite))
 }
 
-func (suite *BlobReadTestSuite) Test_ShouldReturnHttp200_AndFile_AndContentType_WhenNoError() {
+func (suite *BlobReadTestSuite) Test_ShouldReturnHttp200_AndFile_AndContentType_AndContentDispositionWithFilename_WhenNoError() {
 	//GIVEN
 	var (
 		expectedStatus = http.StatusOK
 	)
 
-	suite.blobService.On("ReadBlob", suite.artifactId).Return(suite.contentType, suite.contentLength, suite.randomReadCloser, nil)
+	suite.blobService.On("ReadBlob", suite.artifactId).Return(suite.fileName, suite.contentType, suite.contentLength, suite.contentReadCloser, nil)
 
 	//WHEN
 	suite.blobController.Get(suite.context)
@@ -70,6 +71,7 @@ func (suite *BlobReadTestSuite) Test_ShouldReturnHttp200_AndFile_AndContentType_
 	suite.Equal(suite.content, suite.httpRecorder.Body.Bytes())
 	suite.Equal(suite.contentType, suite.httpRecorder.Header().Get("Content-Type"))
 	suite.Equal(strconv.Itoa(int(suite.contentLength)), suite.httpRecorder.Header().Get("Content-Length"))
+	suite.Equal("attachment; filename=\""+suite.fileName+"\"", suite.httpRecorder.Header().Get("Content-Disposition"))
 }
 
 func (suite *BlobReadTestSuite) Test_ShouldReturnHttp404_AndEmptyBody_WhenArtifactNotUploaded() {
@@ -79,7 +81,7 @@ func (suite *BlobReadTestSuite) Test_ShouldReturnHttp404_AndEmptyBody_WhenArtifa
 		expectedBody   = ""
 	)
 
-	suite.blobService.On("ReadBlob", suite.artifactId).Return("", int64(0), nil, service.ErrArtifactNotFound)
+	suite.blobService.On("ReadBlob", suite.artifactId).Return("", "", int64(0), nil, service.ErrArtifactNotFound)
 
 	//WHEN
 	suite.blobController.Get(suite.context)
@@ -96,7 +98,7 @@ func (suite *BlobReadTestSuite) Test_ShouldReturnHttp500_AndEmptyBody_WhenTreatm
 		expectedBody   = ""
 	)
 
-	suite.blobService.On("ReadBlob", suite.artifactId).Return("", int64(0), nil, errors.New("random error"))
+	suite.blobService.On("ReadBlob", suite.artifactId).Return("", "", int64(0), nil, errors.New("random error"))
 
 	//WHEN
 	suite.blobController.Get(suite.context)

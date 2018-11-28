@@ -35,26 +35,28 @@ func TestBlobRead(t *testing.T) {
 	suite.Run(t, new(BlobReadTestSuite))
 }
 
-func (suite *BlobReadTestSuite) Test_ShouldReturnFile_AndContentType_AndLength_WhenFindSucceeds() {
+func (suite *BlobReadTestSuite) Test_ShouldReturnFile_AndContentType_AndLength_AndName_WhenFindSucceeds() {
 	//GIVEN
 	var (
 		expectedContentType       = "application/data"
 		expectedLength            = int64(12)
 		expectedError       error = nil
 		artifactId                = "artifact1"
+		expectedName              = "artifactName1"
 	)
 
-	suite.artifactDao.On("FindUploadedArtifact", artifactId).Return(&model.ArtifactDTO{Uuid: artifactId, ContentType: expectedContentType, Length: expectedLength}, nil)
+	suite.artifactDao.On("FindUploadedArtifact", artifactId).Return(&model.ArtifactDTO{Uuid: artifactId, ContentType: expectedContentType, Length: expectedLength, Name: expectedName}, nil)
 	suite.blobDao.On("ReadData", artifactId).Return(suite.reader, nil)
 
 	//WHEN
-	var actualContentType, actualLength, actualReader, actualError = suite.blobService.ReadBlob(artifactId)
+	var actualName, actualContentType, actualLength, actualReader, actualError = suite.blobService.ReadBlob(artifactId)
 
 	//THEN
 	suite.Equal(suite.reader, actualReader)
 	suite.Equal(expectedLength, actualLength)
 	suite.Equal(expectedContentType, actualContentType)
 	suite.Equal(expectedError, actualError)
+	suite.Equal(expectedName, actualName)
 }
 
 func (suite *BlobReadTestSuite) Test_ShouldReturnArtifactNotFound_WhenArtifactNotFound() {
@@ -68,7 +70,7 @@ func (suite *BlobReadTestSuite) Test_ShouldReturnArtifactNotFound_WhenArtifactNo
 	suite.blobDao.On("ReadData", artifactId).Return(suite.reader, nil)
 
 	//WHEN
-	var _, _, _, actualError = suite.blobService.ReadBlob(artifactId)
+	var _, _, _, _, actualError = suite.blobService.ReadBlob(artifactId)
 
 	//THEN
 	suite.Equal(expectedError, actualError)
@@ -85,7 +87,7 @@ func (suite *BlobReadTestSuite) Test_ShouldReturnArtifactNotFound_WhenBlobNotUpl
 	suite.blobDao.On("ReadData", artifactId).Return(nil, nil)
 
 	//WHEN
-	var _, _, _, actualError = suite.blobService.ReadBlob(artifactId)
+	var _, _, _, _, actualError = suite.blobService.ReadBlob(artifactId)
 
 	//THEN
 	suite.Equal(expectedError, actualError)
@@ -102,7 +104,7 @@ func (suite *BlobReadTestSuite) Test_ShouldReturnError_WhenFindUploadedArtifactF
 	suite.blobDao.On("ReadData", artifactId).Return(nil, nil)
 
 	//WHEN
-	var _, _, _, actualError = suite.blobService.ReadBlob(artifactId)
+	var _, _, _, _, actualError = suite.blobService.ReadBlob(artifactId)
 
 	//THEN
 	suite.Equal(expectedError, actualError)
@@ -119,7 +121,7 @@ func (suite *BlobReadTestSuite) Test_ShouldReturnError_WhenReadBlobFails() {
 	suite.blobDao.On("ReadData", artifactId).Return(suite.reader, expectedError)
 
 	//WHEN
-	var _, _, _, actualError = suite.blobService.ReadBlob(artifactId)
+	var _, _, _, _, actualError = suite.blobService.ReadBlob(artifactId)
 
 	//THEN
 	suite.Equal(expectedError, actualError)

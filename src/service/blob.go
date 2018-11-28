@@ -8,7 +8,7 @@ import (
 
 type IBlobService interface {
 	SaveBlob(artifactID string, contentType string, reader io.ReadCloser) error
-	ReadBlob(artifactId string) (contentType string, length int64, reader io.ReadCloser, err error)
+	ReadBlob(artifactId string) (filename string, contentType string, length int64, reader io.ReadCloser, err error)
 }
 
 func NewBlobService(blobDao dao.IBlobDao, artifactDao dao.IArtifactDao) *BlobService {
@@ -20,7 +20,7 @@ type BlobService struct {
 	artifactDao dao.IArtifactDao
 }
 
-func (blobService *BlobService) ReadBlob(artifactId string) (contentType string, length int64, reader io.ReadCloser, resultError error) {
+func (blobService *BlobService) ReadBlob(artifactId string) (fileName string, contentType string, length int64, reader io.ReadCloser, resultError error) {
 
 	artifactDto, resultError := blobService.artifactDao.FindUploadedArtifact(artifactId)
 
@@ -37,10 +37,10 @@ func (blobService *BlobService) ReadBlob(artifactId string) (contentType string,
 	}
 
 	if resultError != nil {
-		return "", 0, nil, resultError
+		return "", "", 0, nil, resultError
 	}
 
-	return artifactDto.ContentType, artifactDto.Length, reader, resultError
+	return artifactDto.Name, artifactDto.ContentType, artifactDto.Length, reader, resultError
 }
 
 func (blobService *BlobService) SaveBlob(artifactId string, contentType string, reader io.ReadCloser) error {

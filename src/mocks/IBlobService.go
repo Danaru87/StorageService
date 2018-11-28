@@ -11,7 +11,7 @@ type IBlobService struct {
 }
 
 // ReadBlob provides a mock function with given fields: artifactId
-func (_m *IBlobService) ReadBlob(artifactId string) (string, int64, io.ReadCloser, error) {
+func (_m *IBlobService) ReadBlob(artifactId string) (string, string, int64, io.ReadCloser, error) {
 	ret := _m.Called(artifactId)
 
 	var r0 string
@@ -21,30 +21,37 @@ func (_m *IBlobService) ReadBlob(artifactId string) (string, int64, io.ReadClose
 		r0 = ret.Get(0).(string)
 	}
 
-	var r1 int64
-	if rf, ok := ret.Get(1).(func(string) int64); ok {
+	var r1 string
+	if rf, ok := ret.Get(1).(func(string) string); ok {
 		r1 = rf(artifactId)
 	} else {
-		r1 = ret.Get(1).(int64)
+		r1 = ret.Get(1).(string)
 	}
 
-	var r2 io.ReadCloser
-	if rf, ok := ret.Get(2).(func(string) io.ReadCloser); ok {
+	var r2 int64
+	if rf, ok := ret.Get(2).(func(string) int64); ok {
 		r2 = rf(artifactId)
 	} else {
-		if ret.Get(2) != nil {
-			r2 = ret.Get(2).(io.ReadCloser)
+		r2 = ret.Get(2).(int64)
+	}
+
+	var r3 io.ReadCloser
+	if rf, ok := ret.Get(3).(func(string) io.ReadCloser); ok {
+		r3 = rf(artifactId)
+	} else {
+		if ret.Get(3) != nil {
+			r3 = ret.Get(3).(io.ReadCloser)
 		}
 	}
 
-	var r3 error
-	if rf, ok := ret.Get(3).(func(string) error); ok {
-		r3 = rf(artifactId)
+	var r4 error
+	if rf, ok := ret.Get(4).(func(string) error); ok {
+		r4 = rf(artifactId)
 	} else {
-		r3 = ret.Error(3)
+		r4 = ret.Error(4)
 	}
 
-	return r0, r1, r2, r3
+	return r0, r1, r2, r3, r4
 }
 
 // SaveBlob provides a mock function with given fields: artifactID, contentType, reader

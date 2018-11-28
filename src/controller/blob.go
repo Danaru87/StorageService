@@ -15,7 +15,7 @@ func NewBlobController(blobService service.IBlobService) *BlobController {
 }
 
 func (blobController *BlobController) Get(ctx *gin.Context) {
-	var contentType, contentLength, readCloser, err = blobController.blobService.ReadBlob(ctx.Param("artifact_id"))
+	var fileName, contentType, contentLength, readCloser, err = blobController.blobService.ReadBlob(ctx.Param("artifact_id"))
 
 	if readCloser != nil {
 		defer readCloser.Close()
@@ -29,7 +29,7 @@ func (blobController *BlobController) Get(ctx *gin.Context) {
 		return
 	}
 
-	ctx.DataFromReader(http.StatusOK, contentLength, contentType, readCloser, map[string]string{"Content-Disposition": "attachment; filename=\"toto.zip\""})
+	ctx.DataFromReader(http.StatusOK, contentLength, contentType, readCloser, map[string]string{"Content-Disposition": "attachment; filename=\"" + fileName + "\""})
 }
 
 func (blobController *BlobController) Put(ctx *gin.Context) {
