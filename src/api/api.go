@@ -4,18 +4,19 @@ import (
 	"github.com/UPrefer/StorageService/config"
 	"github.com/UPrefer/StorageService/controller"
 	"github.com/UPrefer/StorageService/dao"
+	"github.com/UPrefer/StorageService/database"
 	"github.com/UPrefer/StorageService/service"
 	"github.com/gin-gonic/gin"
 )
 
-func Handlers() *gin.Engine {
+func Handlers(config *config.Configuration) *gin.Engine {
 	engine := gin.Default()
 
 	var (
-		database = config.NewDatabase("mongodb://root:root@localhost:27017", "StorageService")
+		db = database.NewDatabase("mongodb://"+config.MongoUser+":"+config.MongoPassword+"@"+config.MongoIp+":"+config.MongoPort, config.MongoDB)
 
-		artifactDao = dao.NewArtifactDao(database)
-		blobDao     = dao.NewMongoBlobDao(database)
+		artifactDao = dao.NewArtifactDao(db)
+		blobDao     = dao.NewMongoBlobDao(db)
 
 		utilsService    = service.NewUtilsService()
 		artifactService = service.NewArtifactService(utilsService, artifactDao)

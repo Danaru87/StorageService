@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"github.com/UPrefer/StorageService/config"
+	"github.com/UPrefer/StorageService/database"
 	"github.com/UPrefer/StorageService/model"
 	"github.com/globalsign/mgo"
 	"io"
@@ -12,13 +12,13 @@ type IBlobDao interface {
 	ReadData(artifactId string) (io.ReadCloser, error)
 }
 
-func NewMongoBlobDao(database *config.Database) *MongoBlobDao {
+func NewMongoBlobDao(database *database.Database) *MongoBlobDao {
 	return &MongoBlobDao{collectionName: "artifact", database: database}
 }
 
 type MongoBlobDao struct {
 	collectionName string
-	database       *config.Database
+	database       *database.Database
 }
 
 func (artifactDao *MongoBlobDao) ReadData(artifactId string) (reader io.ReadCloser, err error) {

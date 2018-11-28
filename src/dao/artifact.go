@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"github.com/UPrefer/StorageService/config"
+	"github.com/UPrefer/StorageService/database"
 	"github.com/UPrefer/StorageService/model"
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
@@ -14,14 +14,14 @@ type IArtifactDao interface {
 	DeleteWaitingForUploadArtifact(id string) error
 }
 
-func NewArtifactDao(database *config.Database) *ArtifactDao {
+func NewArtifactDao(database *database.Database) *ArtifactDao {
 	return &ArtifactDao{uploadedCollectionName: "artifact", waitingForUploadCollectionName: "artifact.waitingForUpload", database: database}
 }
 
 type ArtifactDao struct {
 	waitingForUploadCollectionName string
 	uploadedCollectionName         string
-	database                       *config.Database
+	database                       *database.Database
 }
 
 func (dao *ArtifactDao) DeleteWaitingForUploadArtifact(id string) error {
