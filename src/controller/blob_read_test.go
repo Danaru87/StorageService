@@ -79,7 +79,7 @@ func (suite *BlobReadTestSuite) Test_ShouldReturnHttp404_AndEmptyBody_WhenArtifa
 		expectedBody   = ""
 	)
 
-	suite.blobService.On("ReadBlob", suite.artifactId).Return("", int64(0), ioutil.NopCloser(bytes.NewReader([]byte(""))), service.ErrArtifactNotFound)
+	suite.blobService.On("ReadBlob", suite.artifactId).Return("", int64(0), nil, service.ErrArtifactNotFound)
 
 	//WHEN
 	suite.blobController.Get(suite.context)
@@ -96,7 +96,7 @@ func (suite *BlobReadTestSuite) Test_ShouldReturnHttp500_AndEmptyBody_WhenTreatm
 		expectedBody   = ""
 	)
 
-	suite.blobService.On("ReadBlob", suite.artifactId).Return("", int64(0), ioutil.NopCloser(bytes.NewReader([]byte(""))), errors.New("random error"))
+	suite.blobService.On("ReadBlob", suite.artifactId).Return("", int64(0), nil, errors.New("random error"))
 
 	//WHEN
 	suite.blobController.Get(suite.context)

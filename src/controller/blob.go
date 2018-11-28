@@ -16,7 +16,10 @@ func NewBlobController(blobService service.IBlobService) *BlobController {
 
 func (blobController *BlobController) Get(ctx *gin.Context) {
 	var contentType, contentLength, readCloser, err = blobController.blobService.ReadBlob(ctx.Param("artifact_id"))
-	defer readCloser.Close()
+
+	if readCloser != nil {
+		defer readCloser.Close()
+	}
 
 	if err == service.ErrArtifactNotFound {
 		ctx.AbortWithStatus(http.StatusNotFound)
@@ -25,7 +28,8 @@ func (blobController *BlobController) Get(ctx *gin.Context) {
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-	ctx.DataFromReader(http.StatusOK, contentLength, contentType, readCloser, map[string]string{})
+
+	ctx.DataFromReader(http.StatusOK, contentLength, contentType, readCloser, map[string]string{"Content-Disposition": "attachment; filename=\"toto.zip\""})
 }
 
 func (blobController *BlobController) Put(ctx *gin.Context) {
