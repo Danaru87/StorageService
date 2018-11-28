@@ -10,13 +10,13 @@ type IArtifactService struct {
 	mock.Mock
 }
 
-// CreateArtifact provides a mock function with given fields:
-func (_m *IArtifactService) CreateArtifact() (*model.ArtifactDTO, error) {
-	ret := _m.Called()
+// CreateArtifact provides a mock function with given fields: artifactDto
+func (_m *IArtifactService) CreateArtifact(artifactDto *model.ArtifactDTO) (*model.ArtifactDTO, error) {
+	ret := _m.Called(artifactDto)
 
 	var r0 *model.ArtifactDTO
-	if rf, ok := ret.Get(0).(func() *model.ArtifactDTO); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(*model.ArtifactDTO) *model.ArtifactDTO); ok {
+		r0 = rf(artifactDto)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.ArtifactDTO)
@@ -24,8 +24,8 @@ func (_m *IArtifactService) CreateArtifact() (*model.ArtifactDTO, error) {
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
+	if rf, ok := ret.Get(1).(func(*model.ArtifactDTO) error); ok {
+		r1 = rf(artifactDto)
 	} else {
 		r1 = ret.Error(1)
 	}

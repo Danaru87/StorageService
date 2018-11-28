@@ -40,6 +40,7 @@ func (artifactDao *MongoBlobDao) SaveData(artifactDto *model.ArtifactDTO, conten
 		if err == nil {
 			createdFile.SetId(artifactDto.Uuid)
 			createdFile.SetContentType(contentType)
+			createdFile.SetName(artifactDto.Name)
 
 			var _, copyErr = io.Copy(createdFile, reader)
 

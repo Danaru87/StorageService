@@ -6,7 +6,7 @@ import (
 )
 
 type IArtifactService interface {
-	CreateArtifact() (*model.ArtifactDTO, error)
+	CreateArtifact(artifactDto *model.ArtifactDTO) (*model.ArtifactDTO, error)
 	ReadArtifact(id string) (*model.ArtifactDTO, error)
 }
 
@@ -37,17 +37,17 @@ func (artifactService *ArtifactService) ReadArtifact(id string) (*model.Artifact
 	return artifact, err
 }
 
-func (artifactService *ArtifactService) CreateArtifact() (*model.ArtifactDTO, error) {
+func (artifactService *ArtifactService) CreateArtifact(artifactDto *model.ArtifactDTO) (*model.ArtifactDTO, error) {
 	var newId, err = artifactService.utilsService.NewUUID()
 	if err != nil {
 		return nil, err
 	}
 
-	var artifactDto = &model.ArtifactDTO{Uuid: newId}
+	var newArtifactDto = &model.ArtifactDTO{Uuid: newId, Name: artifactDto.Name}
 
-	err = artifactService.artifactDao.CreateArtifact(artifactDto)
+	err = artifactService.artifactDao.CreateArtifact(newArtifactDto)
 	if err != nil {
-		return artifactDto, err
+		return newArtifactDto, err
 	}
-	return artifactDto, nil
+	return newArtifactDto, nil
 }

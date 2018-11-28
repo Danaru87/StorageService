@@ -41,7 +41,7 @@ func (suite *ArtifactReadTestSuite) Test_ShouldReturnHTTP200_AndId_WhenArtifactE
 	//GIVEN
 	var (
 		expectedStatus = http.StatusOK
-		expectedBody   = "{\"uuid\":\"artifact1\"}"
+		expectedBody   = "{\"uuid\":\"artifact1\",\"name\":\"\"}"
 	)
 
 	suite.mockedArtifactService.On("ReadArtifact", suite.artifactId).Return(&model.ArtifactDTO{Uuid: suite.artifactId}, nil)

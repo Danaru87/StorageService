@@ -37,7 +37,7 @@ func (suite *ArtifactCreationTestSuite) Test_ShouldReturnCreatedArtifact_WhenNoE
 	suite.mockedArtifactDao.On("CreateArtifact", &expectedArtifactDto).Return(nil)
 
 	//WHEN
-	var createdArtifactDto, err = suite.artifactService.CreateArtifact()
+	var createdArtifactDto, err = suite.artifactService.CreateArtifact(&model.ArtifactDTO{})
 
 	//THEN
 	suite.Assert().Equal(expectedError, err)
@@ -56,7 +56,7 @@ func (suite *ArtifactCreationTestSuite) Test_ShouldReturnEncounteredError_AndAtt
 	suite.mockedArtifactDao.On("CreateArtifact", expectedArtifactDto).Return(expectedError)
 
 	//WHEN
-	var createdArtifactDto, err = suite.artifactService.CreateArtifact()
+	var createdArtifactDto, err = suite.artifactService.CreateArtifact(&model.ArtifactDTO{})
 
 	//THEN
 	suite.Assert().Equal(expectedError, err)
@@ -73,7 +73,7 @@ func (suite *ArtifactCreationTestSuite) Test_ShouldReturnEncounteredError_WhenUU
 	suite.mockedUtilsService.On("NewUUID").Return("", expectedError)
 
 	//WHEN
-	var createdArtifactDto, err = suite.artifactService.CreateArtifact()
+	var createdArtifactDto, err = suite.artifactService.CreateArtifact(&model.ArtifactDTO{})
 
 	//THEN
 	suite.Assert().Equal(expectedError, err)

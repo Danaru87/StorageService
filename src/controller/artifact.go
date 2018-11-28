@@ -20,11 +20,17 @@ func NewArtifactController(artifactService service.IArtifactService) *ArtifactCo
 
 func (artifactController *ArtifactController) Post(ctx *gin.Context) {
 	var (
-		createdArtifact *model.ArtifactDTO
-		err             error
+		artifactToCreate model.ArtifactDTO
+		createdArtifact  *model.ArtifactDTO
+		err              error
 	)
 
-	createdArtifact, err = artifactController.artifactService.CreateArtifact()
+	err = ctx.BindJSON(&artifactToCreate)
+	if err != nil {
+		return
+	}
+
+	createdArtifact, err = artifactController.artifactService.CreateArtifact(&artifactToCreate)
 	if err != nil {
 		log.Print(err)
 		ctx.AbortWithStatus(http.StatusInternalServerError)

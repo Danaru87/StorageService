@@ -39,7 +39,7 @@ func (suite *BlobCreationTestSuite) Test_ShouldSaveData_AndDeleteArtifactPlaceho
 		expectedError error = nil
 		contentType         = "application/blob"
 		artifactId          = "artifact1"
-		artifact            = &model.ArtifactDTO{Uuid: artifactId}
+		artifact            = &model.ArtifactDTO{Uuid: artifactId, Name: "artifactName1"}
 	)
 
 	suite.artifactDao.On("FindWaitingForUploadArtifact", artifactId).Return(artifact, nil)

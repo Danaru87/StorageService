@@ -15,6 +15,10 @@ type FileBlobDao struct {
 	path string
 }
 
+func (dao *FileBlobDao) ReadData(artifactId string) (io.ReadCloser, error) {
+	return os.Open(dao.path + artifactId)
+}
+
 func (dao *FileBlobDao) SaveData(dto *model.ArtifactDTO, contentType string, reader io.Reader) error {
 	const chunkSize = 255
 	var outputFile, err = os.OpenFile(dao.path+dto.Uuid, os.O_CREATE|os.O_RDWR, 0666)
