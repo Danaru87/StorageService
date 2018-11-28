@@ -71,7 +71,25 @@ func (suite *ArtifactReadTestSuite) Test_ShouldReturnArtifact_WhenFindAlreadyUpl
 	)
 
 	suite.mockedArtifactDao.On("FindWaitingForUploadArtifact", suite.artifactId).Return(nil, nil)
-	suite.mockedArtifactDao.On("FindUploadedArtifact", suite.artifactId).Return(expectedArtifact, expectedError)
+	suite.mockedArtifactDao.On("FindUploadedArtifact", suite.artifactId).Return(expectedArtifact, nil)
+
+	//WHEN
+	var actualArtifact, actualError = suite.artifactService.ReadArtifact(suite.artifactId)
+
+	//THEN
+	suite.Equal(expectedError, actualError)
+	suite.Equal(expectedArtifact, actualArtifact)
+}
+
+func (suite *ArtifactReadTestSuite) Test_ShouldReturnArtifact_WhenFindAlreadyUploadedSucceeds_AndArtifactStillPresentInWaitingForUploadCollection() {
+	//GIVEN
+	var (
+		expectedArtifact       = &model.ArtifactDTO{Uuid: suite.artifactId}
+		expectedError    error = nil
+	)
+
+	suite.mockedArtifactDao.On("FindWaitingForUploadArtifact", suite.artifactId).Return(expectedArtifact, nil)
+	suite.mockedArtifactDao.On("FindUploadedArtifact", suite.artifactId).Return(expectedArtifact, nil)
 
 	//WHEN
 	var actualArtifact, actualError = suite.artifactService.ReadArtifact(suite.artifactId)
