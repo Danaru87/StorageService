@@ -1,0 +1,152 @@
+{
+  "_type": "export",
+  "__export_format": 3,
+  "__export_date": "2018-11-29T09:51:11.586Z",
+  "__export_source": "insomnia.desktop.app:v6.2.0",
+  "resources": [
+    {
+      "_id": "wrk_6e7fbfa2274e4ae7a4b49d8dd7c1984b",
+      "created": 1542796208697,
+      "description": "",
+      "modified": 1542796208697,
+      "name": "StorageService",
+      "parentId": null,
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_b071deff84d646b9999571c86a59c34d",
+      "color": null,
+      "created": 1542796208706,
+      "data": {
+        "artifact_id": "ea8181f6-f359-11e8-b961-0242ac1b0003",
+        "hostname": "localhost",
+        "port": "8080"
+      },
+      "isPrivate": false,
+      "metaSortKey": 1542796208706,
+      "modified": 1543484903873,
+      "name": "New Environment",
+      "parentId": "wrk_6e7fbfa2274e4ae7a4b49d8dd7c1984b",
+      "_type": "environment"
+    },
+    {
+      "_id": "jar_3446de063c8a44e3b6d9437864925231",
+      "cookies": [],
+      "created": 1542796208708,
+      "modified": 1542796208708,
+      "name": "Default Jar",
+      "parentId": "wrk_6e7fbfa2274e4ae7a4b49d8dd7c1984b",
+      "_type": "cookie_jar"
+    },
+    {
+      "_id": "req_84112c4025fa4508b53a83f21827cee8",
+      "authentication": {},
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n\t\"name\":\"file_name\"\n}"
+      },
+      "created": 1542796235320,
+      "description": "",
+      "headers": [
+        {
+          "id": "pair_50bcb0871f164240b2e79754d937a837",
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "isPrivate": false,
+      "metaSortKey": -1542796235320,
+      "method": "POST",
+      "modified": 1543484611202,
+      "name": "create_artifact",
+      "parameters": [],
+      "parentId": "wrk_6e7fbfa2274e4ae7a4b49d8dd7c1984b",
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingMaxTimelineDataSize": 1000,
+      "settingRebuildPath": true,
+      "settingSendCookies": true,
+      "settingStoreCookies": true,
+      "url": "http://{{hostname}}:{{port}}/v1/artifact",
+      "_type": "request"
+    },
+    {
+      "_id": "req_31fccb7c0eac4797a7034e08a19dd101",
+      "authentication": {},
+      "body": {
+        "fileName": "",
+        "mimeType": "application/octet-stream"
+      },
+      "created": 1542814283788,
+      "description": "",
+      "headers": [
+        {
+          "id": "pair_f0bab26ebeda414584c699045c43963d",
+          "name": "Content-Type",
+          "value": "application/octet-stream"
+        }
+      ],
+      "isPrivate": false,
+      "metaSortKey": -1542814283788,
+      "method": "PUT",
+      "modified": 1543484904203,
+      "name": "upload_file",
+      "parameters": [],
+      "parentId": "wrk_6e7fbfa2274e4ae7a4b49d8dd7c1984b",
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingMaxTimelineDataSize": 1000,
+      "settingRebuildPath": true,
+      "settingSendCookies": true,
+      "settingStoreCookies": true,
+      "url": "http://{{hostname}}:{{port}}/v1/artifact/{{ artifact_id }}/blob",
+      "_type": "request"
+    },
+    {
+      "_id": "req_9e1920c3d22e4eeb8dfa4f7e401a2a51",
+      "authentication": {},
+      "body": {},
+      "created": 1543229453765,
+      "description": "",
+      "headers": [],
+      "isPrivate": false,
+      "metaSortKey": -1542796235270,
+      "method": "GET",
+      "modified": 1543484971584,
+      "name": "get_metainfos",
+      "parameters": [],
+      "parentId": "wrk_6e7fbfa2274e4ae7a4b49d8dd7c1984b",
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingMaxTimelineDataSize": 1000,
+      "settingRebuildPath": true,
+      "settingSendCookies": true,
+      "settingStoreCookies": true,
+      "url": "http://{{hostname}}:{{port}}/v1/artifact/{{artifact_id}}",
+      "_type": "request"
+    },
+    {
+      "_id": "req_d314bd86abc644129bef46fbac6fdb2c",
+      "authentication": {},
+      "body": {},
+      "created": 1543339111053,
+      "description": "",
+      "headers": [],
+      "isPrivate": false,
+      "metaSortKey": -1542805259554,
+      "method": "GET",
+      "modified": 1543484365756,
+      "name": "download_file",
+      "parameters": [],
+      "parentId": "wrk_6e7fbfa2274e4ae7a4b49d8dd7c1984b",
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingMaxTimelineDataSize": 1000,
+      "settingRebuildPath": true,
+      "settingSendCookies": true,
+      "settingStoreCookies": true,
+      "url": "http://{{hostname}}:{{port}}/v1/artifact/{{ artifact_id }}/blob",
+      "_type": "request"
+    }
+  ]
+}
