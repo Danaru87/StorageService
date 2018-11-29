@@ -56,7 +56,7 @@ $ ${GO_PATH}/bin/StorageService
 
 ## Usage
 
-Insomnia configuration file is available in repository.
+[Insomnia](https://insomnia.rest/) configuration file [is available in repository](insomnia_conf.json).
 
 ### Create file
 
