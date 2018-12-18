@@ -81,3 +81,15 @@ Downloads the previously uploaded file.
 ### Get Metainfos
 
 Retrieves all meta informations about an artifact.
+
+## Run Gatling tests
+
+Run the following command to run tests with gatling :
+
+~~~~
+docker run -it --rm -v $PWD/gatling/conf:/opt/gatling/conf:z \
+ -v $PWD/gatling/user-files:/opt/gatling/user-files:z \
+ -v $PWD/gatling/results:/opt/gatling/results:z \
+ --network="host" \
+ denvazh/gatling
+~~~~

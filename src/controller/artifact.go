@@ -27,6 +27,7 @@ func (artifactController *ArtifactController) Post(ctx *gin.Context) {
 
 	err = ctx.BindJSON(&artifactToCreate)
 	if err != nil {
+		log.Println(err)
 		return
 	}
 
